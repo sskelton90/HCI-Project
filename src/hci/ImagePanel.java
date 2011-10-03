@@ -125,6 +125,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 				image = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
 				image.getGraphics().drawImage(scaledImage, 0, 0, this);
 			}
+			this.repaint();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -168,7 +169,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 	 */
 	public void addNewPolygon() {
 		//finish the current polygon if any
-		if (currentPolygon != null ) {
+		if (currentPolygon != null && currentPolygon.size() >= 2) {
 			finishPolygon(currentPolygon);
 			polygonsList.add(currentPolygon);
 		}
@@ -219,7 +220,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 	}
 
 	private boolean isFirstPoint(int x, int y) {
-		if (currentPolygon.size() == 0)
+		if (currentPolygon.size() <= 1)
 		{
 			return false;
 		}
