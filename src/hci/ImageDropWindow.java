@@ -1,4 +1,5 @@
 package hci;
+
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.Image;
@@ -26,6 +27,7 @@ import javax.swing.SwingConstants;
 
 public class ImageDropWindow extends JPanel implements DropTargetListener {
 
+	private static final long serialVersionUID = 6040892631425727161L;
 	DropTarget dropTarget;
 	JLabel label;
 	static DataFlavor urlFlavor, uriListFlavor, macPictStreamFlavor;

@@ -1,7 +1,5 @@
 package hci;
 
-import javax.imageio.ImageIO;
-import javax.swing.JPanel;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -12,9 +10,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
-import hci.utils.*;
+import javax.imageio.ImageIO;
+import javax.swing.JPanel;
+
+import shapes.Point;
 
 /**
  * Handles image editing panel
@@ -67,15 +69,13 @@ public class ImagePanel extends JPanel implements MouseListener {
 	 */
 	public ImagePanel(String imageName) throws Exception{
 		this();
-		image = ImageIO.read(new File(imageName));
-		if (image.getWidth() > 800 || image.getHeight() > 600) {
-			int newWidth = image.getWidth() > 800 ? 800 : (image.getWidth() * 600)/image.getHeight();
-			int newHeight = image.getHeight() > 600 ? 600 : (image.getHeight() * 800)/image.getWidth();
-			System.out.println("SCALING TO " + newWidth + "x" + newHeight );
-			Image scaledImage = image.getScaledInstance(newWidth, newHeight, Image.SCALE_FAST);
-			image = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
-			image.getGraphics().drawImage(scaledImage, 0, 0, this);
+		
+		if (imageName == null)
+		{
+			return;
 		}
+		
+		setImage(imageName);
 	}
 
 	/**
@@ -94,17 +94,40 @@ public class ImagePanel extends JPanel implements MouseListener {
 	public void paint(Graphics g) {
 		super.paint(g);
 		
-		//display iamge
+		//display image
 		ShowImage();
 		
 		//display all the completed polygons
-		for(ArrayList<Point> polygon : polygonsList) {
-			drawPolygon(polygon);
-			finishPolygon(polygon);
+		if (polygonsList.size() != 0)
+		{
+			for(ArrayList<Point> polygon : polygonsList) {
+				drawPolygon(polygon);
+				finishPolygon(polygon);
+			}
 		}
 		
 		//display current polygon
-		drawPolygon(currentPolygon);
+		if (currentPolygon != null)
+		{
+			drawPolygon(currentPolygon);
+		}
+	}
+	
+	public void setImage(String filePath)
+	{
+		try {
+			image = ImageIO.read(new File(filePath));
+			if (image.getWidth() > 800 || image.getHeight() > 600) {
+				int newWidth = image.getWidth() > 800 ? 800 : (image.getWidth() * 600)/image.getHeight();
+				int newHeight = image.getHeight() > 600 ? 600 : (image.getHeight() * 800)/image.getWidth();
+				System.out.println("SCALING TO " + newWidth + "x" + newHeight );
+				Image scaledImage = image.getScaledInstance(newWidth, newHeight, Image.SCALE_FAST);
+				image = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+				image.getGraphics().drawImage(scaledImage, 0, 0, this);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -155,6 +178,12 @@ public class ImagePanel extends JPanel implements MouseListener {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		// If no image, don't register click
+		if (image == null)
+		{
+			return;
+		}
+		
 		int x = e.getX();
 		int y = e.getY();
 		
@@ -169,6 +198,15 @@ public class ImagePanel extends JPanel implements MouseListener {
 		//if the left button than we will add a vertex to poly
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			g.setColor(Color.GREEN);
+			
+			// If this is the first point of the polygon again, or user double clicks finish it
+			if (isFirstPoint(x,y) || e.getClickCount() == 2)
+			{
+				System.out.println("Finishin' dat polygon");
+				addNewPolygon();
+				return;
+			}
+			
 			if (currentPolygon.size() != 0) {
 				Point lastVertex = currentPolygon.get(currentPolygon.size() - 1);
 				g.drawLine(lastVertex.getX(), lastVertex.getY(), x, y);
@@ -178,6 +216,16 @@ public class ImagePanel extends JPanel implements MouseListener {
 			currentPolygon.add(new Point(x,y));
 			System.out.println(x + " " + y);
 		} 
+	}
+
+	private boolean isFirstPoint(int x, int y) {
+		if (currentPolygon.size() == 0)
+		{
+			return false;
+		}
+		
+		Point firstPoint = currentPolygon.get(0);
+		return x > firstPoint.getX() - 5 && x < firstPoint.getX() + 5 && y < firstPoint.getY() + 5 && y > firstPoint.getY() - 5;
 	}
 
 	@Override
