@@ -217,4 +217,11 @@ public class ImagePanel extends JPanel implements MouseListener {
 	{
 		return this.polygonsList;
 	}
+	
+	public void deletePolygon(Polygon polygon)
+	{
+		this.polygonsList.remove(polygon);
+		this.currentPolygon = new Polygon(this);
+		this.repaint();
+	}
 }
