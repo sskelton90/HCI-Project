@@ -49,7 +49,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 	 * default constructor, sets up the window properties
 	 */
 	public ImagePanel() {
-		currentPolygon = new Polygon();
+		currentPolygon = new Polygon(this);
 		polygonsList = new ArrayList<Polygon>();
 
 		this.setVisible(true);
@@ -142,7 +142,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 			polygonsList.add(currentPolygon);
 		}
 		
-		currentPolygon = new Polygon();
+		currentPolygon = new Polygon(this);
 	}
 
 	@Override
@@ -213,4 +213,8 @@ public class ImagePanel extends JPanel implements MouseListener {
 	public void mouseReleased(MouseEvent arg0) {
 	}
 	
+	public ArrayList<Polygon> getPolygons()
+	{
+		return this.polygonsList;
+	}
 }

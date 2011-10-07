@@ -5,6 +5,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 
+import javax.swing.JPanel;
+
+import dialogs.AddTagSelectColourDialog;
+
 public class Polygon {
 	
 	/**
@@ -24,6 +28,9 @@ public class Polygon {
 
 	boolean hasBeenEdited = false;
 	boolean isSelected = false;
+	boolean finishedOnce = false;
+
+	private JPanel panel;
 	
 	public String getTag() {
 		return tag;
@@ -62,8 +69,9 @@ public class Polygon {
 		return this.vertices.size();
 	}	
 
-	public Polygon()
+	public Polygon(JPanel panel)
 	{
+		this.panel = panel;
 		isSelected = true;
 	}
 	
@@ -89,20 +97,35 @@ public class Polygon {
 				Point prevVertex = this.vertices.get(i - 1);
 				g.drawLine(prevVertex.getX(), prevVertex.getY(), currentVertex.getX(), currentVertex.getY());
 			}
+			
+			if (i == this.vertices.size() - 1 && finishedOnce)
+			{
+				g.drawLine(this.vertices.get(0).getX(), this.vertices.get(0).getY(), currentVertex.getX(), currentVertex.getY());
+			}
 			g.fillOval(currentVertex.getX() - 5, currentVertex.getY() - 5, 10, 10);
 		}
 	}
 	
 	public void finishPolygon(Graphics graphics) {
 		//if there are less than 3 vertices than nothing to be completed
-		if (this.vertices.size() >= 3) {
+		if (this.vertices.size() >= 3 && !finishedOnce) {
 			Point firstVertex = this.vertices.get(0);
 			Point lastVertex = this.vertices.get(this.vertices.size() - 1);
 		
 			Graphics2D g = (Graphics2D) graphics;
 			g.setColor(this.colour);
 			g.drawLine(firstVertex.getX(), firstVertex.getY(), lastVertex.getX(), lastVertex.getY());
+			
+			AddTagSelectColourDialog dialog = new AddTagSelectColourDialog(this);
+			dialog.setVisible(true);
+			
+			finishedOnce = true;
 		}
+	}
+	
+	public Graphics getGraphics()
+	{
+		return this.panel.getGraphics();
 	}
 
 }
