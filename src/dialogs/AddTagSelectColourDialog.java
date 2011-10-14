@@ -3,7 +3,6 @@ package dialogs;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -46,8 +45,6 @@ public class AddTagSelectColourDialog extends JDialog {
 		this.setPreferredSize(new Dimension(300, 200));
 		this.setMinimumSize(new Dimension(300, 200));
 		this.setResizable(false);
-		
-		this.setLocationRelativeTo(null);
 	}
 	
 	public JComponent createTextField()
@@ -116,7 +113,6 @@ public class AddTagSelectColourDialog extends JDialog {
         cancel.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent event) {
-            	parent.deletePolygon();
                 dispose();
             }
         });

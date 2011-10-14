@@ -1,6 +1,5 @@
 package hci;
 
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -9,13 +8,13 @@ import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
-import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
 import listeners.OpenFileListener;
+import shapes.Polygon;
 
 /**
  * Main class of the program - handles display of the main window
@@ -73,6 +72,10 @@ public class ImageLabeller extends JFrame {
 		
 		this.addWindowListener(new WindowAdapter() {
 		  	public void windowClosing(WindowEvent event) {
+		  		for (Polygon polygon : imagePanel.getPolygons()) {
+					System.out.println("Saved " + polygon.getTag());
+				}
+
 		  		System.out.println("Bye bye!");
 		    	System.exit(0);
 		  	}
@@ -89,9 +92,6 @@ public class ImageLabeller extends JFrame {
 
         //create toolbox panel
         toolboxPanel = new JPanel();
-        JList listOfPolygons = new JList();
-        listOfPolygons.setPreferredSize(new Dimension(250, 80));
-        toolboxPanel.add(listOfPolygons);
 		
 		//add toolbox to window
 		appPanel.add(toolboxPanel);

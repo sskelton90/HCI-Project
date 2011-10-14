@@ -1,7 +1,5 @@
 package shapes;
 
-import hci.ImagePanel;
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -128,12 +126,6 @@ public class Polygon {
 	public Graphics getGraphics()
 	{
 		return this.panel.getGraphics();
-	}
-	
-	public void deletePolygon()
-	{
-		ImagePanel imagePanel = (ImagePanel) this.panel;
-		imagePanel.deletePolygon(this);
 	}
 
 }
