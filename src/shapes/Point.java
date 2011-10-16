@@ -1,9 +1,6 @@
 package shapes;
 
 import java.awt.Graphics;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -14,23 +11,17 @@ import javax.swing.JPanel;
  * @author Michal
  *
  */
-public class Point extends JLabel implements MouseListener, MouseMotionListener {
+public class Point extends JLabel {
 	
 	private int x = 0;
 	private int y = 0;
-	private int startDragX, startDragY;
-	boolean dragging = false;
-	private JPanel frame;
 	
 	public Point() {
 	}
 	
-	public Point(int x, int y, JPanel frame) {
+	public Point(int x, int y) {
 		this.x = x;
 		this.y = y;
-		this.frame = frame;
-		addMouseListener(this);
-		addMouseMotionListener(this);
 	}
 
 	public int getX() {
@@ -70,54 +61,4 @@ public class Point extends JLabel implements MouseListener, MouseMotionListener 
 		return "Point: " + x + " " + y;
 	}
 
-	@Override
-	public void mouseClicked(MouseEvent e) 
-	{
-		System.out.println("Mouse clicked");
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) 
-	{
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) 
-	{
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) 
-	{
-		this.startDragX = e.getX();
-		this.startDragY = e.getY();
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) 
-	{
-		if (dragging)
-		{
-			System.out.println("Dragging to " + this.toString());
-			dragging = false;
-		}
-	}
-
-	@Override
-	public void mouseDragged(MouseEvent e) 
-	{
-		int newX = getX() + (e.getX() - startDragX);
-		int newY = getY() + (e.getY() - startDragY);
-		
-		setLocation(newX, newY);
-		dragging = true;
-		frame.repaint();
-	}
-	
-	@Override
-	public void mouseMoved(MouseEvent arg0) 
-	{
-		
-	}
-	
 }

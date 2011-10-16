@@ -1,6 +1,7 @@
 package dialogs;
 
 import hci.ImageLabeller;
+import hci.ImagePanel;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -14,6 +15,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -25,26 +27,28 @@ public class AddTagSelectColourDialog extends JDialog {
 	
 	private Color selectedColour = Color.GREEN;
 	private final JTextField textField = new JTextField(10);
-	private final Polygon parent;
+	private final Polygon parentPolygon;
 	private final JLabel currentColourText = new JLabel("0x" + Integer.toHexString(Color.GREEN.getRGB()));
-	private boolean edit = false;
+	private final ImagePanel parentPanel;
+	private boolean edit;
 
-	public AddTagSelectColourDialog(Polygon parent) 
+	public AddTagSelectColourDialog(Polygon parentPolygon, ImagePanel parentPanel) 
 	{
 		initUI();
-		this.parent = parent;
+		this.parentPolygon = parentPolygon;
+		this.parentPanel = parentPanel;
 		
-		if (parent.getTag() != null)
+		if (parentPolygon.getTag() != null)
 		{
 			this.edit = true;
-			this.textField.setText(parent.getTag());
+			this.textField.setText(parentPolygon.getTag());
 		}
 		
-		if (parent.getColour() != Color.GREEN)
+		if (parentPolygon.getColour() != Color.GREEN)
 		{
-			this.edit = true;
-			this.currentColourText.setText("0x" + "0x" + Integer.toHexString(parent.getColour().getRGB()));
-			this.selectedColour = parent.getColour();
+			this.currentColourText.setText("0x" + Integer.toHexString(parentPolygon.getColour().getRGB()));
+			this.currentColourText.setForeground(parentPolygon.getColour());
+			this.selectedColour = parentPolygon.getColour();
 		}
 	}
 
@@ -117,10 +121,16 @@ public class AddTagSelectColourDialog extends JDialog {
         save.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent event) {
-                parent.setColour(selectedColour);
-                parent.setTag(textField.getText());
-                parent.drawPolygon();
-                ImageLabeller.polygonList.addPolygon(parent);
+            	if (textField.getText().isEmpty())
+            	{
+            		JOptionPane.showMessageDialog(AddTagSelectColourDialog.this, "Tags must have a title.\nPlease name your tag.", "Forgotten to name your tag?", JOptionPane.ERROR_MESSAGE);
+            		return;
+            	}
+            	
+                parentPolygon.setColour(selectedColour);
+                parentPolygon.setTag(textField.getText());
+                parentPolygon.drawPolygon();
+                ImageLabeller.polygonList.addPolygon(parentPolygon);
                 dispose();
             }
         });
@@ -130,6 +140,13 @@ public class AddTagSelectColourDialog extends JDialog {
         cancel.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent event) {
+            	if (!edit)
+            	{
+            		parentPanel.deletePolygon(parentPolygon);
+            		parentPolygon.setHidden();
+            		parentPanel.resetShape();
+            		parentPanel.repaint();
+            	}
                 dispose();
             }
         });

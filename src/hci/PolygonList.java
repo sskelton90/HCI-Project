@@ -49,6 +49,11 @@ public class PolygonList extends JPanel implements ListSelectionListener
 		
 		this.listModel.addElement(polygon);
 	}
+	
+	public void removePolygon(Polygon polygon)
+	{
+		this.listModel.removeElement(polygon);
+	}
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) 

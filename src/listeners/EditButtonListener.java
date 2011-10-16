@@ -13,7 +13,7 @@ public class EditButtonListener implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (ImagePanel.currentlySelectedPolygon != null)
 		{
-			AddTagSelectColourDialog dialog = new AddTagSelectColourDialog(ImagePanel.currentlySelectedPolygon);
+			AddTagSelectColourDialog dialog = new AddTagSelectColourDialog(ImagePanel.currentlySelectedPolygon, null);
 			dialog.setVisible(true);
 		}
 	}

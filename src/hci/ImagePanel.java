@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import shapes.Point;
@@ -49,10 +50,11 @@ public class ImagePanel extends JPanel implements MouseListener {
 	
 	public static Polygon currentlySelectedPolygon = null;
 	
-	int currentlySelectedPoint;
+	public static enum MODES {ADDING, EDITING, STARTUP};
+	public static MODES currentMode = MODES.STARTUP;
 
-	private boolean adding;
-	
+	private int currentlySelectedPoint;
+
 	/**
 	 * default constructor, sets up the window properties
 	 */
@@ -67,8 +69,6 @@ public class ImagePanel extends JPanel implements MouseListener {
 		this.setMinimumSize(panelSize);
 		this.setPreferredSize(panelSize);
 		this.setMaximumSize(panelSize);
-		
-		this.adding = true;
 		
 		addMouseListener(this);
 	}
@@ -112,10 +112,6 @@ public class ImagePanel extends JPanel implements MouseListener {
 		if (polygonsList.size() != 0)
 		{
 			for(Polygon polygon : polygonsList) {
-				for (int i = 0; i < polygon.getSize(); i++)
-				{
-					System.out.println(polygon.getPoint(i));
-				}
 				polygon.drawPolygon();
 				polygon.finishPolygon(this.getGraphics());
 			}
@@ -142,6 +138,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 				image.getGraphics().drawImage(scaledImage, 0, 0, this);
 			}
 			this.repaint();
+			ImageLabeller.addTag.setEnabled(true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -156,8 +153,13 @@ public class ImagePanel extends JPanel implements MouseListener {
 			currentPolygon.finishPolygon(this.getGraphics());
 			polygonsList.add(currentPolygon);
 		}
-		adding = false;
 		currentPolygon = new Polygon(this);
+	}
+	
+	public void resetShape()
+	{
+		currentPolygon = new Polygon(this);
+		this.repaint();
 	}
 
 	@Override
@@ -181,24 +183,34 @@ public class ImagePanel extends JPanel implements MouseListener {
 		
 		//if the left button than we will add a vertex to poly
 		if (e.getButton() == MouseEvent.BUTTON1) {
-			g.setColor(Color.GREEN);
 			
-			// If this is the first point of the polygon again, or user double clicks finish it
-			if (isFirstPoint(x,y) || e.getClickCount() == 2)
+			switch (currentMode)
 			{
-				System.out.println("Finishin' dat polygon");
-				addNewPolygon();
-				return;
+			case ADDING:
+				g.setColor(Color.GREEN);
+				
+				// If this is the first point of the polygon again, or user double clicks finish it
+				if (isFirstPoint(x,y) || e.getClickCount() == 2)
+				{
+					addNewPolygon();
+					return;
+				}
+				
+				if (currentPolygon.getSize() != 0) {
+					Point lastVertex = currentPolygon.getPoint(currentPolygon.getSize() - 1);
+					g.drawLine(lastVertex.getX(), lastVertex.getY(), x, y);
+				}
+				g.fillOval(x-5,y-5,10,10);
+				
+				currentPolygon.addPoint(new Point(x, y));
+				break;
+			case EDITING:
+				break;
+			case STARTUP:
+				JOptionPane.showMessageDialog(this, "It looks like you're trying to add a new tag.\nClick the \"+\" button in the toolbox to add a new tag.", "Adding a new tag?", JOptionPane.INFORMATION_MESSAGE);
+				break;
 			}
 			
-			if (currentPolygon.getSize() != 0) {
-				Point lastVertex = currentPolygon.getPoint(currentPolygon.getSize() - 1);
-				g.drawLine(lastVertex.getX(), lastVertex.getY(), x, y);
-			}
-			g.fillOval(x-5,y-5,10,10);
-			
-			currentPolygon.addPoint(new Point(x, y, this));
-			System.out.println(x + " " + y);
 		} 
 	}
 
@@ -236,7 +248,9 @@ public class ImagePanel extends JPanel implements MouseListener {
 	public void deletePolygon(Polygon polygon)
 	{
 		this.polygonsList.remove(polygon);
+		ImageLabeller.polygonList.removePolygon(currentlySelectedPolygon);
 		this.currentPolygon = new Polygon(this);
+		currentlySelectedPolygon = null;
 		this.repaint();
 	}
 	
@@ -248,8 +262,8 @@ public class ImagePanel extends JPanel implements MouseListener {
 			{
 				if (polygon.getPoint(i).contains(point))
 				{
-					this.currentlySelectedPolygon = polygon;
-					this.currentlySelectedPoint = i;
+					currentlySelectedPolygon = polygon;
+					currentlySelectedPoint = i;
 					return polygon.getPoint(i);
 				}
 			}

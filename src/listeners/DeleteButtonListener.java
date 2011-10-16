@@ -9,6 +9,13 @@ import javax.swing.JOptionPane;
 
 public class DeleteButtonListener implements ActionListener {
 
+	private ImagePanel panel;
+
+	public DeleteButtonListener(ImagePanel panel)
+	{
+		this.panel = panel;
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (ImagePanel.currentlySelectedPolygon != null)
@@ -18,7 +25,7 @@ public class DeleteButtonListener implements ActionListener {
                     JOptionPane.YES_NO_OPTION);
 			if (confirmed == JOptionPane.YES_OPTION)
 			{
-				//delete polygon
+				panel.deletePolygon(ImagePanel.currentlySelectedPolygon);
 			}
 		}
 	}
