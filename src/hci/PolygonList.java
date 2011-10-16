@@ -46,7 +46,6 @@ public class PolygonList extends JPanel implements ListSelectionListener
 			}
 			
 		}
-		
 		this.listModel.addElement(polygon);
 	}
 	

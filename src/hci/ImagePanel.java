@@ -11,11 +11,24 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Text;
 
 import shapes.Point;
 import shapes.Polygon;
@@ -30,7 +43,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 	 * some java stuff to get rid of warnings
 	 */
 	private static final long serialVersionUID = 1L;
-
+	
 	/**
 	 * image to be tagged
 	 */
@@ -54,6 +67,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 	public static MODES currentMode = MODES.STARTUP;
 
 	private int currentlySelectedPoint;
+	private String currentFile;
 
 	/**
 	 * default constructor, sets up the window properties
@@ -128,6 +142,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 	public void setImage(String filePath)
 	{
 		try {
+			this.currentFile = filePath;
 			image = ImageIO.read(new File(filePath));
 			if (image.getWidth() > 800 || image.getHeight() > 600) {
 				int newWidth = image.getWidth() > 800 ? 800 : (image.getWidth() * 600)/image.getHeight();
@@ -153,6 +168,13 @@ public class ImagePanel extends JPanel implements MouseListener {
 			currentPolygon.finishPolygon(this.getGraphics());
 			polygonsList.add(currentPolygon);
 		}
+		
+		ImageLabeller.saveAsFile.setEnabled(true);
+		if (ImageLabeller.savedOnce)
+		{
+			ImageLabeller.saveFile.setEnabled(true);
+		}
+		
 		currentPolygon = new Polygon(this);
 	}
 	
@@ -270,6 +292,56 @@ public class ImagePanel extends JPanel implements MouseListener {
 		}
 		
 		return null;
+	}
+	
+	public String getPolygonsAsString()
+	{
+		String xmlString = null;
+		
+		try {
+			DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder;
+			docBuilder = builderFactory.newDocumentBuilder();
+			
+			//creating a new instance of a DOM to build a DOM tree.
+			Document doc = docBuilder.newDocument();
+			
+			Element root = doc.createElement("TAGSET");
+			doc.appendChild(root);
+			
+			Element image = doc.createElement("IMAGE");
+			root.appendChild(image);
+			
+			Text imageText = doc.createTextNode(this.currentFile);
+			image.appendChild(imageText);
+			
+			Element tags = doc.createElement("TAGS");
+			root.appendChild(tags);
+			
+			for (Polygon polygon: this.polygonsList)
+			{
+				polygon.getXmlRepresentation(tags, doc);
+			}
+			
+			TransformerFactory transfac = TransformerFactory.newInstance();
+            Transformer trans = transfac.newTransformer();
+            trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            trans.setOutputProperty(OutputKeys.INDENT, "yes");
+
+            //create string from xml tree
+            StringWriter sw = new StringWriter();
+            StreamResult result = new StreamResult(sw);
+            DOMSource source = new DOMSource(doc);
+            trans.transform(source, result);
+            xmlString = sw.toString();
+
+            //print xml
+            System.out.println("Here's the xml:\n\n" + xmlString);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return xmlString;
 	}
 
 }

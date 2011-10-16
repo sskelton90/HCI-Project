@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 import listeners.DeleteButtonListener;
 import listeners.EditButtonListener;
 import listeners.OpenFileListener;
+import listeners.SaveAsFileListener;
 
 /**
  * Main class of the program - handles display of the main window
@@ -40,6 +41,7 @@ public class ImageLabeller extends JFrame {
 	public static JMenuItem loadTags = new JMenuItem("Load tags for image...");
 	public static JMenuItem saveFile = new JMenuItem("Save", KeyEvent.VK_S);
 	public static JMenuItem saveAsFile = new JMenuItem("Save as...");
+	public static boolean savedOnce = false;
 
 	/**
 	 * some java stuff to get rid of warnings
@@ -89,9 +91,6 @@ public class ImageLabeller extends JFrame {
 		JMenuItem openFile = new JMenuItem("Open...",
                 KeyEvent.VK_O);
 		JMenuItem loadTags = new JMenuItem("Load tags for image...");
-		JMenuItem saveFile = new JMenuItem("Save", KeyEvent.VK_S);
-		JMenuItem saveAsFile = new JMenuItem("Save as...");
-		
 		
 		this.addWindowListener(new WindowAdapter() {
 		  	public void windowClosing(WindowEvent event) {
@@ -148,6 +147,7 @@ public class ImageLabeller extends JFrame {
 
 		// Set up the menu bar
 		openFile.addActionListener(new OpenFileListener(imagePanel, this));
+		saveAsFile.addActionListener(new SaveAsFileListener(imagePanel, this));
 		fileMenu.add(openFile);
 		fileMenu.add(loadTags);
 		fileMenu.add(saveFile);
@@ -161,16 +161,6 @@ public class ImageLabeller extends JFrame {
         this.setVisible(true);
 	}
 	
-	public ImageLabeller()
-	{
-		try {
-			this.setIconImage(ImageIO.read(new File("images/icon.png")));
-			setupGUI();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
 	/**
 	 * Runs the program
 	 * @param argv path to an image
@@ -178,7 +168,8 @@ public class ImageLabeller extends JFrame {
 	public static void main(String argv[]) {
 		try {
 			//create a window and display the image
-			new ImageLabeller();
+			ImageLabeller labeller = new ImageLabeller();
+			labeller.setupGUI();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

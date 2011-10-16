@@ -9,6 +9,10 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Text;
+
 import dialogs.AddTagSelectColourDialog;
 
 public class Polygon {
@@ -140,6 +144,43 @@ public class Polygon {
 			finishedOnce = true;
 		}
 	}
+	
+	public void getXmlRepresentation(Element tags, Document doc)
+	{
+		Element tag = doc.createElement("TAG");
+		tags.appendChild(tag);
+		
+		Element name = doc.createElement("NAME");
+		tag.appendChild(name);
+		
+		Text nameText = doc.createTextNode(this.tag);
+		name.appendChild(nameText);
+		
+		Element colour = doc.createElement("COLOUR");
+		tag.appendChild(colour);
+		
+		Text colourText = doc.createTextNode("0x" + Integer.toHexString(this.colour.getRGB()));
+		colour.appendChild(colourText);
+		
+		Element vertices = doc.createElement("VERTICES");
+		tag.appendChild(vertices);
+		
+		for (Point p : this.vertices)
+		{
+			Element vertex = doc.createElement("VERTEX");
+			vertices.appendChild(vertex);
+			
+			Element x = doc.createElement("X");
+			vertex.appendChild(x);
+			Text xValue = doc.createTextNode(Integer.toString(p.getX()));
+			x.appendChild(xValue);
+			
+			Element y = doc.createElement("Y");
+			vertex.appendChild(y);
+			Text yValue = doc.createTextNode(Integer.toString(p.getY()));
+			y.appendChild(yValue);
+		}
+	}
 
 	public Graphics getGraphics()
 	{
@@ -162,7 +203,6 @@ public class Polygon {
 		this.isSelected = false;
 		this.panel.repaint();
 	}
-
 
 	public boolean equals(Polygon p)
 	{
