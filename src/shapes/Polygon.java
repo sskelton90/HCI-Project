@@ -15,7 +15,8 @@ import org.w3c.dom.Text;
 
 import dialogs.AddTagSelectColourDialog;
 
-public class Polygon {
+public class Polygon 
+{
 
 	/**
 	 * Each {@link Polygon} has a set of vertices.
@@ -36,9 +37,23 @@ public class Polygon {
 	boolean isSelected = false;
 	boolean finishedOnce = false;
 	boolean hidden = false;
+	boolean loadedFromFile = false;
 
 	private JPanel panel;
+	
+	public Polygon(JPanel panel, boolean loadedFromFile)
+	{
+		this.panel = panel;
+		this.loadedFromFile = loadedFromFile;
+		this.isSelected = false;
+	}
 
+	public Polygon(JPanel panel)
+	{
+		this.panel = panel;
+		isSelected = false;
+	}
+	
 	public String getTag() {
 		return tag;
 	}
@@ -76,11 +91,6 @@ public class Polygon {
 		return this.vertices.size();
 	}	
 
-	public Polygon(JPanel panel)
-	{
-		this.panel = panel;
-		isSelected = false;
-	}
 
 	public void addPoint(Point point)
 	{
@@ -138,8 +148,11 @@ public class Polygon {
 			Line l = new Line(lastVertex, firstVertex);
 			l.paintLine(g, this.isSelected);
 
-			AddTagSelectColourDialog dialog = new AddTagSelectColourDialog(this, (ImagePanel) panel);
-			dialog.setVisible(true);
+			if (!loadedFromFile)
+			{
+				AddTagSelectColourDialog dialog = new AddTagSelectColourDialog(this, (ImagePanel) panel);
+				dialog.setVisible(true);
+			}
 
 			finishedOnce = true;
 		}
@@ -159,7 +172,7 @@ public class Polygon {
 		Element colour = doc.createElement("COLOUR");
 		tag.appendChild(colour);
 		
-		Text colourText = doc.createTextNode("0x" + Integer.toHexString(this.colour.getRGB()));
+		Text colourText = doc.createTextNode("0x" + Integer.toHexString(this.colour.getRGB()).substring(2));
 		colour.appendChild(colourText);
 		
 		Element vertices = doc.createElement("VERTICES");

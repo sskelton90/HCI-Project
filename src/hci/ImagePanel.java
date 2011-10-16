@@ -19,7 +19,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -28,6 +27,8 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 import shapes.Point;
@@ -152,8 +153,11 @@ public class ImagePanel extends JPanel implements MouseListener {
 				image = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
 				image.getGraphics().drawImage(scaledImage, 0, 0, this);
 			}
-			this.repaint();
+			ImageLabeller.loadTags.setEnabled(true);
 			ImageLabeller.addTag.setEnabled(true);
+			this.polygonsList = new ArrayList<Polygon>();
+			ImageLabeller.polygonList.replaceItems(this.polygonsList);
+			this.repaint();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -298,6 +302,11 @@ public class ImagePanel extends JPanel implements MouseListener {
 	{
 		String xmlString = null;
 		
+		if (this.polygonsList.isEmpty())
+		{
+			return null;
+		}
+		
 		try {
 			DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder;
@@ -334,14 +343,68 @@ public class ImagePanel extends JPanel implements MouseListener {
             DOMSource source = new DOMSource(doc);
             trans.transform(source, result);
             xmlString = sw.toString();
-
-            //print xml
-            System.out.println("Here's the xml:\n\n" + xmlString);
-		} catch (Exception e) {
+		} 
+		catch (Exception e) 
+		{
 			e.printStackTrace();
 		}
 		
 		return xmlString;
+	}
+	
+	public void loadPolygonsFromFile(File xmlFile)
+	{
+		try {
+			DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+			Document doc = docBuilder.parse (xmlFile);
+			
+			doc.getDocumentElement().normalize();
+			
+			NodeList imageName = doc.getElementsByTagName("IMAGE");
+			Node node = imageName.item(0);
+			
+			if (!node.getTextContent().equals(this.currentFile))
+			{
+				JOptionPane.showMessageDialog(this, "Tagset doesn't match image!\nPlease select matching tagset for this image.", "Incorrect Tagset", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			NodeList tags = doc.getElementsByTagName("TAG");
+			System.out.println(tags.getLength() + " tags loaded.");
+			this.polygonsList = new ArrayList<Polygon>();
+			
+			for (int i = 0; i < tags.getLength(); i++)
+			{
+				Polygon polygon = new Polygon(this, true);
+				Element tag = (Element) tags.item(i);
+				
+				NodeList name = tag.getElementsByTagName("NAME");
+				NodeList colour = tag.getElementsByTagName("COLOUR");
+				
+				polygon.setTag(name.item(0).getTextContent());
+				polygon.setColour(Color.decode(colour.item(0).getTextContent()));
+				
+				NodeList xs = tag.getElementsByTagName("X");
+				NodeList ys = tag.getElementsByTagName("Y");
+				
+				for (int j = 0; j < xs.getLength(); j++)
+				{
+					int x = Integer.parseInt(xs.item(j).getTextContent());
+					int y = Integer.parseInt(ys.item(j).getTextContent());
+					System.out.println("Adding: " + x + " and " + y);
+					polygon.addPoint(new Point(x, y));
+				}
+				this.polygonsList.add(polygon);
+			}
+			
+			ImageLabeller.polygonList.replaceItems(this.polygonsList);
+			this.repaint();
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
 	}
 
 }

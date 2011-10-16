@@ -1,6 +1,7 @@
 package hci;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
@@ -52,6 +53,15 @@ public class PolygonList extends JPanel implements ListSelectionListener
 	public void removePolygon(Polygon polygon)
 	{
 		this.listModel.removeElement(polygon);
+	}
+	
+	public void replaceItems(ArrayList<Polygon> polygons)
+	{
+		this.listModel.clear();
+		
+		for (Polygon p : polygons){
+			this.listModel.addElement(p);
+		}
 	}
 
 	@Override

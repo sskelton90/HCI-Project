@@ -43,6 +43,12 @@ public class SaveAsFileListener implements ActionListener, ItemListener
 			System.out.println("User wants to save to " + file.getPath());
 			
 			String xml = this.panel.getPolygonsAsString();
+			
+			if (xml == null)
+			{
+				return;
+			}
+			
 			BufferedWriter bw;
 			try {
 				bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file + ".tags")));

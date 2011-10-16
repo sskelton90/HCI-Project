@@ -22,6 +22,7 @@ import javax.swing.JPanel;
 
 import listeners.DeleteButtonListener;
 import listeners.EditButtonListener;
+import listeners.LoadTagFileListener;
 import listeners.OpenFileListener;
 import listeners.SaveAsFileListener;
 
@@ -90,7 +91,6 @@ public class ImageLabeller extends JFrame {
 		JMenu fileMenu = new JMenu("File");
 		JMenuItem openFile = new JMenuItem("Open...",
                 KeyEvent.VK_O);
-		JMenuItem loadTags = new JMenuItem("Load tags for image...");
 		
 		this.addWindowListener(new WindowAdapter() {
 		  	public void windowClosing(WindowEvent event) {
@@ -138,16 +138,18 @@ public class ImageLabeller extends JFrame {
         
         toolboxPanel.add(editButtonPanel);
 
-        loadTags.setEnabled(false);
-		saveFile.setEnabled(false);
-		saveAsFile.setEnabled(false);
+        ImageLabeller.loadTags.setEnabled(false);
+		ImageLabeller.saveFile.setEnabled(false);
+		ImageLabeller.saveAsFile.setEnabled(false);
 		
 		//add toolbox to window
 		appPanel.add(toolboxPanel);
 
 		// Set up the menu bar
 		openFile.addActionListener(new OpenFileListener(imagePanel, this));
-		saveAsFile.addActionListener(new SaveAsFileListener(imagePanel, this));
+		ImageLabeller.saveAsFile.addActionListener(new SaveAsFileListener(imagePanel, this));
+		ImageLabeller.loadTags.addActionListener(new LoadTagFileListener(imagePanel, this));
+		
 		fileMenu.add(openFile);
 		fileMenu.add(loadTags);
 		fileMenu.add(saveFile);
