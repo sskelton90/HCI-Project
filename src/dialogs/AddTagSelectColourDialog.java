@@ -1,5 +1,7 @@
 package dialogs;
 
+import hci.ImageLabeller;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -21,18 +23,31 @@ public class AddTagSelectColourDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	
-	private Color selectedColour = null;
+	private Color selectedColour = Color.GREEN;
 	private final JTextField textField = new JTextField(10);
 	private final Polygon parent;
-	private final JLabel currentColour = new JLabel("0x" + Integer.toHexString(Color.GREEN.getRGB()));
-	
+	private final JLabel currentColourText = new JLabel("0x" + Integer.toHexString(Color.GREEN.getRGB()));
+	private boolean edit = false;
 
 	public AddTagSelectColourDialog(Polygon parent) 
 	{
 		initUI();
 		this.parent = parent;
+		
+		if (parent.getTag() != null)
+		{
+			this.edit = true;
+			this.textField.setText(parent.getTag());
+		}
+		
+		if (parent.getColour() != Color.GREEN)
+		{
+			this.edit = true;
+			this.currentColourText.setText("0x" + "0x" + Integer.toHexString(parent.getColour().getRGB()));
+			this.selectedColour = parent.getColour();
+		}
 	}
-	
+
 	public void initUI()
 	{
 		setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
@@ -66,6 +81,7 @@ public class AddTagSelectColourDialog extends JDialog {
 		
 		JLabel label = new JLabel("Colour:");
 		
+		this.currentColourText.setForeground(selectedColour);
 		
 		JButton colourButton = new JButton("Select Colour...");
 		colourButton.addActionListener(new ActionListener() {
@@ -79,14 +95,14 @@ public class AddTagSelectColourDialog extends JDialog {
 				
 				if (selectedColour != null)
 				{
-					currentColour.setForeground(selectedColour);
-					currentColour.setText("0x" + Integer.toHexString(selectedColour.getRGB()));
+					currentColourText.setForeground(selectedColour);
+					currentColourText.setText("0x" + Integer.toHexString(selectedColour.getRGB()));
 				}
 			}
 		});
 		
 		innerPanel.add(label);
-		innerPanel.add(currentColour);
+		innerPanel.add(currentColourText);
 		innerPanel.add(colourButton);
 		
 		return innerPanel;
@@ -103,7 +119,8 @@ public class AddTagSelectColourDialog extends JDialog {
             public void actionPerformed(ActionEvent event) {
                 parent.setColour(selectedColour);
                 parent.setTag(textField.getText());
-                parent.drawPolygon(parent.getGraphics());
+                parent.drawPolygon();
+                ImageLabeller.polygonList.addPolygon(parent);
                 dispose();
             }
         });

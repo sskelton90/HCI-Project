@@ -72,15 +72,18 @@ public class Polygon {
 	public Polygon(JPanel panel)
 	{
 		this.panel = panel;
-		isSelected = true;
+		isSelected = false;
 	}
 	
 	public void addPoint(Point point)
 	{
-		if (isSelected)
-		{
-			vertices.add(point);
-		}
+		vertices.add(point);
+	}
+	
+	public void addPointWithIndex(Point point, int index)
+	{
+			vertices.remove(index);
+			vertices.add(index, point);
 	}
 	
 	public Point getPoint(int index)
@@ -88,21 +91,24 @@ public class Polygon {
 		return this.vertices.get(index);
 	}
 	
-	public void drawPolygon(Graphics graphics) {
-		Graphics2D g = (Graphics2D) graphics;
-		g.setColor(this.colour);
+	public void drawPolygon() {
+		Graphics2D g = (Graphics2D) this.panel.getGraphics();
 		for(int i = 0; i < this.vertices.size(); i++) {
 			Point currentVertex = this.vertices.get(i);
+			g.setColor(this.colour);
 			if (i != 0) {
 				Point prevVertex = this.vertices.get(i - 1);
-				g.drawLine(prevVertex.getX(), prevVertex.getY(), currentVertex.getX(), currentVertex.getY());
+				
+				Line l = new Line(prevVertex, currentVertex);
+				l.paintLine(g, this.isSelected);
 			}
 			
 			if (i == this.vertices.size() - 1 && finishedOnce)
 			{
-				g.drawLine(this.vertices.get(0).getX(), this.vertices.get(0).getY(), currentVertex.getX(), currentVertex.getY());
+				Line l = new Line(this.vertices.get(0), currentVertex);
+				l.paintLine(g, this.isSelected);
 			}
-			g.fillOval(currentVertex.getX() - 5, currentVertex.getY() - 5, 10, 10);
+			currentVertex.paintComponent(g);
 		}
 	}
 	
@@ -114,7 +120,8 @@ public class Polygon {
 		
 			Graphics2D g = (Graphics2D) graphics;
 			g.setColor(this.colour);
-			g.drawLine(firstVertex.getX(), firstVertex.getY(), lastVertex.getX(), lastVertex.getY());
+			Line l = new Line(lastVertex, firstVertex);
+			l.paintLine(g, this.isSelected);
 			
 			AddTagSelectColourDialog dialog = new AddTagSelectColourDialog(this);
 			dialog.setVisible(true);
@@ -128,4 +135,39 @@ public class Polygon {
 		return this.panel.getGraphics();
 	}
 
+	public String toString()
+	{
+		return this.tag;
+	}
+	
+	public void select()
+	{
+		this.isSelected = true;
+		this.panel.repaint();
+	}
+	
+	public void unselect()
+	{
+		this.isSelected = false;
+		this.panel.repaint();
+	}
+	
+	
+	public boolean equals(Polygon p)
+	{
+		if (p.getSize() != this.getSize())
+		{
+			return false;
+		}
+		
+		for (int i = 0; i < p.getSize(); i++)
+		{
+			if (!p.getPoint(i).equals(this.getPoint(i)))
+			{
+				return false;
+			}
+		}
+		
+		return true;
+	}
 }

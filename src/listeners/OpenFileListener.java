@@ -25,8 +25,8 @@ public class OpenFileListener implements ActionListener, ItemListener {
 	}
 	
 	@Override
-	public void itemStateChanged(ItemEvent e) {
-		System.out.println("Open dat file!");
+	public void itemStateChanged(ItemEvent e) 
+	{
 	}
 
 	@Override

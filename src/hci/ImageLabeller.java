@@ -7,12 +7,14 @@ import java.awt.event.WindowEvent;
 import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
+import listeners.EditButtonListener;
 import listeners.OpenFileListener;
 import shapes.Polygon;
 
@@ -24,6 +26,13 @@ import shapes.Polygon;
 public class ImageLabeller extends JFrame {
 	private static Logger log =
 			 Logger.getLogger(ImageLabeller.class.getName());
+	
+	public static PolygonList polygonList = new PolygonList();
+	public static JButton editTag = new JButton("Edit tag");
+	public static JButton deletePolygon = new JButton("Delete shape");
+	public static JMenuItem loadTags = new JMenuItem("Load tags for image...");
+	public static JMenuItem saveFile = new JMenuItem("Save", KeyEvent.VK_S);
+	public static JMenuItem saveAsFile = new JMenuItem("Save as...");
 
 	/**
 	 * some java stuff to get rid of warnings
@@ -68,12 +77,17 @@ public class ImageLabeller extends JFrame {
 		final ImagePanel imagePanel = new ImagePanel();
 		JMenu fileMenu = new JMenu("File");
 		JMenuItem openFile = new JMenuItem("Open...",
-                KeyEvent.VK_T);
+                KeyEvent.VK_O);
+		JMenuItem loadTags = new JMenuItem("Load tags for image...");
+		JMenuItem saveFile = new JMenuItem("Save", KeyEvent.VK_S);
+		JMenuItem saveAsFile = new JMenuItem("Save as...");
+		
 		
 		this.addWindowListener(new WindowAdapter() {
 		  	public void windowClosing(WindowEvent event) {
 		  		for (Polygon polygon : imagePanel.getPolygons()) {
 					System.out.println("Saved " + polygon.getTag());
+					System.out.println("with size: " + polygon.getSize());
 				}
 
 		  		System.out.println("Bye bye!");
@@ -92,6 +106,19 @@ public class ImageLabeller extends JFrame {
 
         //create toolbox panel
         toolboxPanel = new JPanel();
+        toolboxPanel.setLayout(new BoxLayout(toolboxPanel, BoxLayout.Y_AXIS));
+        toolboxPanel.add(polygonList);
+        
+        editTag.addActionListener(new EditButtonListener());
+        
+        editTag.setEnabled(false);
+        deletePolygon.setEnabled(false);
+        
+        toolboxPanel.add(editTag);
+        toolboxPanel.add(deletePolygon);
+		loadTags.setEnabled(false);
+		saveFile.setEnabled(false);
+		saveAsFile.setEnabled(false);
 		
 		//add toolbox to window
 		appPanel.add(toolboxPanel);
@@ -99,6 +126,10 @@ public class ImageLabeller extends JFrame {
 		// Set up the menu bar
 		openFile.addActionListener(new OpenFileListener(imagePanel, this));
 		fileMenu.add(openFile);
+		fileMenu.add(loadTags);
+		fileMenu.add(saveFile);
+		fileMenu.add(saveAsFile);
+		
 		menuBar.add(fileMenu);
 		this.setJMenuBar(menuBar);
 		

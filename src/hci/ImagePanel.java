@@ -45,6 +45,14 @@ public class ImagePanel extends JPanel implements MouseListener {
 	 */
 	ArrayList<Polygon> polygonsList = null;
 	
+	boolean tagsUpdated = false;
+	
+	public static Polygon currentlySelectedPolygon = null;
+	
+	int currentlySelectedPoint;
+
+	private boolean adding;
+	
 	/**
 	 * default constructor, sets up the window properties
 	 */
@@ -59,6 +67,8 @@ public class ImagePanel extends JPanel implements MouseListener {
 		this.setMinimumSize(panelSize);
 		this.setPreferredSize(panelSize);
 		this.setMaximumSize(panelSize);
+		
+		this.adding = true;
 		
 		addMouseListener(this);
 	}
@@ -102,7 +112,11 @@ public class ImagePanel extends JPanel implements MouseListener {
 		if (polygonsList.size() != 0)
 		{
 			for(Polygon polygon : polygonsList) {
-				polygon.drawPolygon(this.getGraphics());
+				for (int i = 0; i < polygon.getSize(); i++)
+				{
+					System.out.println(polygon.getPoint(i));
+				}
+				polygon.drawPolygon();
 				polygon.finishPolygon(this.getGraphics());
 			}
 		}
@@ -110,8 +124,9 @@ public class ImagePanel extends JPanel implements MouseListener {
 		//display current polygon
 		if (currentPolygon != null)
 		{
-			this.currentPolygon.drawPolygon(this.getGraphics());
+			this.currentPolygon.drawPolygon();
 		}
+		
 	}
 	
 	public void setImage(String filePath)
@@ -141,7 +156,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 			currentPolygon.finishPolygon(this.getGraphics());
 			polygonsList.add(currentPolygon);
 		}
-		
+		adding = false;
 		currentPolygon = new Polygon(this);
 	}
 
@@ -182,7 +197,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 			}
 			g.fillOval(x-5,y-5,10,10);
 			
-			currentPolygon.addPoint(new Point(x,y));
+			currentPolygon.addPoint(new Point(x, y, this));
 			System.out.println(x + " " + y);
 		} 
 	}
@@ -206,15 +221,41 @@ public class ImagePanel extends JPanel implements MouseListener {
 	}
 
 	@Override
-	public void mousePressed(MouseEvent arg0) {
+	public void mousePressed(MouseEvent e) {
 	}
 
 	@Override
-	public void mouseReleased(MouseEvent arg0) {
+	public void mouseReleased(MouseEvent e) {
 	}
-	
+
 	public ArrayList<Polygon> getPolygons()
 	{
 		return this.polygonsList;
 	}
+	
+	public void deletePolygon(Polygon polygon)
+	{
+		this.polygonsList.remove(polygon);
+		this.currentPolygon = new Polygon(this);
+		this.repaint();
+	}
+	
+	public Point findPoint(java.awt.Point point)
+	{
+		for (Polygon polygon : this.polygonsList)
+		{
+			for (int i = 0; i < polygon.getSize(); i++)
+			{
+				if (polygon.getPoint(i).contains(point))
+				{
+					this.currentlySelectedPolygon = polygon;
+					this.currentlySelectedPoint = i;
+					return polygon.getPoint(i);
+				}
+			}
+		}
+		
+		return null;
+	}
+
 }
