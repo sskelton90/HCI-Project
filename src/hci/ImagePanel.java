@@ -180,6 +180,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 		}
 		
 		currentPolygon = new Polygon(this);
+		ImagePanel.currentMode = MODES.EDITING;
 	}
 	
 	public void resetShape()
@@ -231,6 +232,10 @@ public class ImagePanel extends JPanel implements MouseListener {
 				currentPolygon.addPoint(new Point(x, y));
 				break;
 			case EDITING:
+				System.out.printf("x: %d y: %d\n", e.getPoint().x, e.getPoint().y);
+				Point p = this.findPoint(e.getPoint());
+				if (p != null)
+					System.out.println(p + " clicked.");
 				break;
 			case STARTUP:
 				JOptionPane.showMessageDialog(this, "It looks like you're trying to add a new tag.\nClick the \"+\" button in the toolbox to add a new tag.", "Adding a new tag?", JOptionPane.INFORMATION_MESSAGE);
@@ -286,13 +291,18 @@ public class ImagePanel extends JPanel implements MouseListener {
 		{
 			for (int i = 0; i < polygon.getSize(); i++)
 			{
+				System.out.println(polygon.getPoint(i));
 				if (polygon.getPoint(i).contains(point))
 				{
 					currentlySelectedPolygon = polygon;
 					currentlySelectedPoint = i;
+					polygon.select();
+					ImageLabeller.polygonList.setSelected(polygon);
+					
 					return polygon.getPoint(i);
 				}
 			}
+			polygon.unselect();
 		}
 		
 		return null;
@@ -399,6 +409,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 			}
 			
 			ImageLabeller.polygonList.replaceItems(this.polygonsList);
+			ImagePanel.currentMode = MODES.EDITING;
 			this.repaint();
 		} 
 		catch (Exception e) 

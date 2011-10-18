@@ -63,6 +63,11 @@ public class PolygonList extends JPanel implements ListSelectionListener
 			this.listModel.addElement(p);
 		}
 	}
+	
+	public void setSelected(Polygon polygon)
+	{
+		this.list.setSelectedValue(polygon, true);
+	}
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) 

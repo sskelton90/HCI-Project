@@ -53,7 +53,7 @@ public class Point extends JLabel {
 	
 	public boolean contains(java.awt.Point point)
 	{
-		return (this.x <= point.x + 5) && (this.x >= point.x - 5) && (this.y <= point.y + 5) && (this.x >= point.y - 5);
+		return (this.x <= point.x + 5) && (this.x >= point.x - 5) && (this.y <= point.y + 5) && (this.y >= point.y - 5);
 	}
 	
 	public String toString()
