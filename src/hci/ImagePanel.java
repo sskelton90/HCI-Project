@@ -161,6 +161,13 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			ImageLabeller.addTag.setEnabled(true);
 			this.polygonsList = new ArrayList<Polygon>();
 			ImageLabeller.polygonList.replaceItems(this.polygonsList);
+			
+			int choice = JOptionPane.showConfirmDialog(this, "There aren't any tags loaded.\nWould you like to open a tags file now?", "Open Tags File", JOptionPane.YES_NO_OPTION);
+			if (choice == JOptionPane.YES_OPTION)
+			{
+				ImageLabeller.loadTags.doClick();
+			}
+			
 			this.repaint();
 		} catch (IOException e) {
 			e.printStackTrace();
