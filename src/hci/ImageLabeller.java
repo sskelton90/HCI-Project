@@ -1,5 +1,7 @@
 package hci;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,12 +17,12 @@ import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
 
 import listeners.DeleteButtonListener;
 import listeners.EditButtonListener;
@@ -46,6 +48,7 @@ public class ImageLabeller extends JFrame {
 	public static JMenuItem saveAsFile = new JMenuItem("Save as...");
 	public static boolean savedOnce = false;
 	public static String savedAs = "";
+	public static JLabel STATUS = new JLabel("To open an image; click File then Open Image.");
 
 	/**
 	 * some java stuff to get rid of warnings
@@ -92,7 +95,7 @@ public class ImageLabeller extends JFrame {
 		JMenuBar menuBar = new JMenuBar();
 		final ImagePanel imagePanel = new ImagePanel();
 		JMenu fileMenu = new JMenu("File");
-		JMenuItem openFile = new JMenuItem("Open...",
+		JMenuItem openFile = new JMenuItem("Open Image...",
                 KeyEvent.VK_O);
 		JMenu helpMenu = new JMenu("Help");
 		JMenuItem userGuide = new JMenuItem("View User Guide");
@@ -148,8 +151,11 @@ public class ImageLabeller extends JFrame {
 		  					System.exit(0);
 		  					break;
 		  				}
+		  				return;
 		  			}
 		  		}
+		  		System.out.println("Bye bye!");
+		  		System.exit(0);
 		  	}
 		});
 
@@ -157,15 +163,19 @@ public class ImageLabeller extends JFrame {
 		appPanel = new JPanel();
 		this.setLayout(new BoxLayout(appPanel, BoxLayout.X_AXIS));
 		this.setContentPane(appPanel);
-		
+
+		getContentPane().setLayout(new BorderLayout());
+	
+		getContentPane().add(STATUS, BorderLayout.SOUTH);
         //Create and set up the image panel.
 		imagePanel.setOpaque(true); //content panes must be opaque
-        appPanel.add(imagePanel);
+        appPanel.add(imagePanel, BorderLayout.WEST);
 
         //create toolbox panel
         toolboxPanel = new JPanel();
         BoxLayout toolboxPanelLayout = new BoxLayout(toolboxPanel, BoxLayout.Y_AXIS);
         toolboxPanel.setLayout(toolboxPanelLayout);
+        polygonList.setMaximumSize(new Dimension(500, 100));
         toolboxPanel.add(polygonList);
         
         JPanel editButtonPanel = new JPanel();
@@ -179,6 +189,7 @@ public class ImageLabeller extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				ImagePanel.currentMode = ImagePanel.MODES.ADDING;
+				STATUS.setText("Click on the image to place points. Click and drag to edit points. Press - to delete tag.");
 			}
 		});
         
@@ -190,7 +201,7 @@ public class ImageLabeller extends JFrame {
         editButtonPanel.add(editTag);
         editButtonPanel.add(deletePolygon);
         
-        toolboxPanel.add(editButtonPanel);
+        toolboxPanel.add(editButtonPanel, BorderLayout.EAST);
 
         ImageLabeller.loadTags.setEnabled(false);
 		ImageLabeller.saveFile.setEnabled(false);

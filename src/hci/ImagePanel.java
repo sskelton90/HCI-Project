@@ -166,7 +166,13 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			if (choice == JOptionPane.YES_OPTION)
 			{
 				ImageLabeller.loadTags.doClick();
+				ImageLabeller.STATUS.setText("To add a new tag click the + button. To edit a tag's shape click and drag the points");
 			}
+			else
+			{
+				ImageLabeller.STATUS.setText("To add a new tag click the + button");
+			}
+			
 			
 			this.repaint();
 		} catch (IOException e) {
