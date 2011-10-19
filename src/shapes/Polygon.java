@@ -89,7 +89,14 @@ public class Polygon
 	public int getSize()
 	{
 		return this.vertices.size();
-	}	
+	}
+	
+	public void updatePoint(int point, int x, int y)
+	{
+		Point p = this.getPoint(point);
+		p.setX(x);
+		p.setY(y);
+	}
 
 
 	public void addPoint(Point point)
@@ -203,6 +210,18 @@ public class Polygon
 	public String toString()
 	{
 		return this.tag;
+	}
+	
+	public String toStringVertices()
+	{
+		String output = null;
+		for (Point p : this.vertices)
+		{
+			output += p.toString();
+			output += " ";
+		}
+		
+		return output;
 	}
 
 	public void select()

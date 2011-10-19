@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +40,7 @@ import shapes.Polygon;
  * @author Michal
  *
  */
-public class ImagePanel extends JPanel implements MouseListener {
+public class ImagePanel extends JPanel implements MouseListener, MouseMotionListener {
 	/**
 	 * some java stuff to get rid of warnings
 	 */
@@ -61,6 +62,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 	ArrayList<Polygon> polygonsList = null;
 	
 	boolean tagsUpdated = false;
+	public boolean needSaved = false;
 	
 	public static Polygon currentlySelectedPolygon = null;
 	
@@ -68,8 +70,9 @@ public class ImagePanel extends JPanel implements MouseListener {
 	public static MODES currentMode = MODES.STARTUP;
 
 	private int currentlySelectedPoint;
+	private boolean dragging = false;
 	private String currentFile;
-
+	
 	/**
 	 * default constructor, sets up the window properties
 	 */
@@ -86,6 +89,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 		this.setMaximumSize(panelSize);
 		
 		addMouseListener(this);
+		addMouseMotionListener(this);
 	}
 	
 	/**
@@ -178,7 +182,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 		{
 			ImageLabeller.saveFile.setEnabled(true);
 		}
-		
+		this.needSaved = true;
 		currentPolygon = new Polygon(this);
 		ImagePanel.currentMode = MODES.EDITING;
 	}
@@ -232,10 +236,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 				currentPolygon.addPoint(new Point(x, y));
 				break;
 			case EDITING:
-				System.out.printf("x: %d y: %d\n", e.getPoint().x, e.getPoint().y);
-				Point p = this.findPoint(e.getPoint());
-				if (p != null)
-					System.out.println(p + " clicked.");
+				this.findPoint(e.getPoint());
 				break;
 			case STARTUP:
 				JOptionPane.showMessageDialog(this, "It looks like you're trying to add a new tag.\nClick the \"+\" button in the toolbox to add a new tag.", "Adding a new tag?", JOptionPane.INFORMATION_MESSAGE);
@@ -256,20 +257,83 @@ public class ImagePanel extends JPanel implements MouseListener {
 	}
 
 	@Override
-	public void mouseEntered(MouseEvent arg0) {
+	public void mouseEntered(MouseEvent e) {
 	}
 
 	@Override
-	public void mouseExited(MouseEvent arg0) {
+	public void mouseExited(MouseEvent e) {
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
+	public void mousePressed(MouseEvent e) 
+	{
+		if (currentMode == MODES.EDITING)
+		{
+			System.out.println("Mouse pressed");
+			Point point = this.findPoint(e.getPoint());
+			
+			if (point == null)
+			{
+				return;
+			}
+		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		if (this.dragging)
+		{
+			int index = 0;
+			
+			for (Polygon p : this.polygonsList)
+			{
+				if (p.equals(currentlySelectedPolygon))
+				{
+					index = this.polygonsList.indexOf(p);
+				}
+			}
+			
+			Polygon p = this.polygonsList.get(index);
+			p.getPoint(currentlySelectedPoint).setX(e.getX());
+			p.getPoint(currentlySelectedPoint).setY(e.getY());
+			
+			this.currentlySelectedPoint = 0;
+			this.dragging = false;
+			this.repaint();
+			
+			ImageLabeller.saveAsFile.setEnabled(true);
+			ImageLabeller.saveFile.setEnabled(true);
+			this.needSaved = true;
+		}
 	}
+	
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		if (currentMode == MODES.EDITING)
+		{
+			int index = 0;
+			
+			for (Polygon p : this.polygonsList)
+			{
+				if (p.equals(currentlySelectedPolygon))
+				{
+					index = this.polygonsList.indexOf(p);
+				}
+			}
+			
+			Polygon p = this.polygonsList.get(index);
+			p.getPoint(currentlySelectedPoint).setX(e.getX());
+			p.getPoint(currentlySelectedPoint).setY(e.getY());
+
+			this.repaint();
+			this.dragging = true;
+		}
+	}
+	
+	@Override
+	public void mouseMoved(MouseEvent e) {
+	}
+
 
 	public ArrayList<Polygon> getPolygons()
 	{
@@ -417,5 +481,6 @@ public class ImagePanel extends JPanel implements MouseListener {
 			e.printStackTrace();
 		}
 	}
+
 
 }

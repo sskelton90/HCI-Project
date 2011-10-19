@@ -1,5 +1,6 @@
 package listeners;
 
+import hci.ImageLabeller;
 import hci.ImagePanel;
 
 import java.awt.event.ActionEvent;
@@ -41,6 +42,9 @@ public class LoadTagFileListener implements ActionListener, ItemListener {
 			File file = fileChooser.getSelectedFile();
 			this.imagePanel.loadPolygonsFromFile(file);			
 			System.out.println("File " + file.getPath() + " has been selected.");
+			
+			ImageLabeller.savedAs = file.getPath();
+			ImageLabeller.savedOnce = true;
 		}
 	}		
 }

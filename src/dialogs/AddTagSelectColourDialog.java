@@ -64,6 +64,8 @@ public class AddTagSelectColourDialog extends JDialog {
 		this.setPreferredSize(new Dimension(300, 200));
 		this.setMinimumSize(new Dimension(300, 200));
 		this.setResizable(false);
+		
+		this.setLocationRelativeTo(null);
 	}
 	
 	public JComponent createTextField()

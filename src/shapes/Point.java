@@ -11,7 +11,7 @@ import javax.swing.JPanel;
  * @author Michal
  *
  */
-public class Point extends JLabel {
+public class Point {
 	
 	private int x = 0;
 	private int y = 0;
@@ -40,7 +40,6 @@ public class Point extends JLabel {
 		this.y = y;
 	}
 	
-	@Override
 	public void paintComponent(Graphics graphics)
 	{
 		graphics.fillOval(this.getX() - 5, this.getY() - 5, 10, 10);

@@ -26,6 +26,7 @@ public class DeleteButtonListener implements ActionListener {
 			if (confirmed == JOptionPane.YES_OPTION)
 			{
 				panel.deletePolygon(ImagePanel.currentlySelectedPolygon);
+				panel.needSaved = true;
 			}
 		}
 	}

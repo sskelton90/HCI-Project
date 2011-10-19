@@ -1,5 +1,6 @@
 package listeners;
 
+import hci.ImageLabeller;
 import hci.ImagePanel;
 
 import java.awt.event.ActionEvent;
@@ -42,7 +43,11 @@ public class OpenFileListener implements ActionListener, ItemListener {
 		{
 			File file = fileChooser.getSelectedFile();
 			imagePanel.setImage(file.getPath());
-			System.out.println("File " + file.getPath() + " has been selected.");
+			
+			ImageLabeller.saveAsFile.setEnabled(false);
+			ImageLabeller.saveFile.setEnabled(false);
+			ImageLabeller.savedOnce = false;
+			ImageLabeller.savedAs = "";
 		}
 	}		
 }

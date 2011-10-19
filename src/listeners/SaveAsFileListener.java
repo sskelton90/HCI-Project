@@ -1,5 +1,6 @@
 package listeners;
 
+import hci.ImageLabeller;
 import hci.ImagePanel;
 
 import java.awt.event.ActionEvent;
@@ -41,6 +42,9 @@ public class SaveAsFileListener implements ActionListener, ItemListener
 		{
 			File file = fileChooser.getSelectedFile();
 			System.out.println("User wants to save to " + file.getPath());
+			
+			ImageLabeller.savedOnce = true;
+			ImageLabeller.savedAs = file.getPath();
 			
 			String xml = this.panel.getPolygonsAsString();
 			

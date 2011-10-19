@@ -6,6 +6,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
@@ -14,6 +18,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
@@ -40,6 +45,7 @@ public class ImageLabeller extends JFrame {
 	public static JMenuItem saveFile = new JMenuItem("Save", KeyEvent.VK_S);
 	public static JMenuItem saveAsFile = new JMenuItem("Save as...");
 	public static boolean savedOnce = false;
+	public static String savedAs = "";
 
 	/**
 	 * some java stuff to get rid of warnings
@@ -88,11 +94,62 @@ public class ImageLabeller extends JFrame {
 		JMenu fileMenu = new JMenu("File");
 		JMenuItem openFile = new JMenuItem("Open...",
                 KeyEvent.VK_O);
-		
+		JMenu helpMenu = new JMenu("Help");
+		JMenuItem userGuide = new JMenuItem("View User Guide");
 		this.addWindowListener(new WindowAdapter() {
 		  	public void windowClosing(WindowEvent event) {
-		  		System.out.println("Bye bye!");
-		    	System.exit(0);
+		  		if (imagePanel.needSaved)
+		  		{
+		  			if (savedOnce)
+		  			{
+		  				int option = JOptionPane.showConfirmDialog(ImageLabeller.this, "You have made changes to the tags.\nDo you want to save your changes before you exit the program?", "Are you sure?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+		  				
+		  				switch (option)
+		  				{
+		  				case JOptionPane.YES_OPTION:
+		  					String xml = imagePanel.getPolygonsAsString();
+		  					
+		  					if (xml == null)
+		  					{
+		  						return;
+		  					}
+		  					
+		  					File file = new File(savedAs);
+		  					
+		  					BufferedWriter bw;
+		  					try {
+		  						bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
+		  						bw.write(xml);
+		  						bw.flush();
+		  						bw.close();
+		  					} catch (Exception exception) {
+		  						exception.printStackTrace();
+		  					}
+		  					System.out.println("Bye bye!");
+		  			    	System.exit(0);
+		  					break;
+		  				case JOptionPane.NO_OPTION:
+		  					System.out.println("Bye bye!");
+		  			    	System.exit(0);
+		  					break;
+		  				}
+		  			}
+		  			else
+		  			{
+		  				int option = JOptionPane.showConfirmDialog(ImageLabeller.this, "You have made changes to the tags.\nDo you want to save your changes before you exit the program?", "Are you sure?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+		  				
+		  				switch (option)
+		  				{
+		  				case JOptionPane.YES_OPTION:
+		  					ImageLabeller.saveAsFile.doClick();
+		  					System.exit(0);
+		  					break;
+		  				case JOptionPane.NO_OPTION:
+		  					System.exit(0);
+		  					break;
+		  				}
+		  			}
+		  		}
 		  	}
 		});
 
@@ -147,12 +204,24 @@ public class ImageLabeller extends JFrame {
 		ImageLabeller.saveAsFile.addActionListener(new SaveAsFileListener(imagePanel, this));
 		ImageLabeller.loadTags.addActionListener(new LoadTagFileListener(imagePanel, this));
 		
+		userGuide.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				HelpViewer viewer = new HelpViewer();
+				viewer.setVisible(true);
+			}
+		});
+		
 		fileMenu.add(openFile);
 		fileMenu.add(loadTags);
 		fileMenu.add(saveFile);
 		fileMenu.add(saveAsFile);
 		
+		helpMenu.add(userGuide);
+		
 		menuBar.add(fileMenu);
+		menuBar.add(helpMenu);
 		this.setJMenuBar(menuBar);
 		
 		//display all the stuff
