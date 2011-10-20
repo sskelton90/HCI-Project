@@ -6,13 +6,13 @@ import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
-import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -35,9 +35,8 @@ import listeners.SaveAsFileListener;
  * @author Michal
  *
  */
-public class ImageLabeller extends JFrame {
-	private static Logger log =
-			 Logger.getLogger(ImageLabeller.class.getName());
+public class ImageLabeller extends JFrame
+{
 	
 	public static PolygonList polygonList = new PolygonList();
 	public static JButton editTag = new JButton("Edit");

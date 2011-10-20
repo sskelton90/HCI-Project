@@ -131,7 +131,6 @@ public class AddTagSelectColourDialog extends JDialog {
             	
                 parentPolygon.setColour(selectedColour);
                 parentPolygon.setTag(textField.getText());
-                parentPolygon.drawPolygon();
                 ImageLabeller.polygonList.addPolygon(parentPolygon);
                 dispose();
             }

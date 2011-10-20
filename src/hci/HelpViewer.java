@@ -1,33 +1,51 @@
 package hci;
 
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridLayout;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
-public class HelpViewer extends JFrame 
+public class HelpViewer extends JFrame
 {
 
 	public HelpViewer()
 	{
-		this.setVisible(true);
-
-		Dimension panelSize = new Dimension(400, 300);
-		this.setSize(panelSize);
-		this.setMinimumSize(panelSize);
-		this.setPreferredSize(panelSize);
-		this.setMaximumSize(panelSize);
-		
+		this.setLayout(new GridLayout());
 		this.setLocationRelativeTo(null);
 		
+		this.setPreferredSize(new Dimension(800, 600));
+		this.setMinimumSize(new Dimension(800, 600));
 		
-		JTextArea textArea = new JTextArea();
-		JScrollPane areaScrollPane = new JScrollPane(textArea);
-		areaScrollPane.setVerticalScrollBarPolicy(
-		                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		areaScrollPane.setPreferredSize(new Dimension(250, 250));
-		textArea.setEditable(false);
-		this.add(textArea);
+        JEditorPane textArea = new JEditorPane();
+        textArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+ 
+        //Add Components to this panel.
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridwidth = GridBagConstraints.REMAINDER;
+ 
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 1.0;
+        c.weighty = 1.0;
+        add(scrollPane, c);
+
+		String textToSet = "";
+		try {
+			BufferedReader in = new BufferedReader(new FileReader("textfiles/HelpFile"));
+			String str;
+			while ((str = in.readLine()) != null) 
+			{
+				textToSet += (str + "\n");
+			}
+			in.close();
+		} catch (IOException e) {}
+		
+		textArea.setText(textToSet);
 	}
 }

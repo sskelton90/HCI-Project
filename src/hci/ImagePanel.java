@@ -6,6 +6,10 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -40,7 +44,8 @@ import shapes.Polygon;
  * @author Michal
  *
  */
-public class ImagePanel extends JPanel implements MouseListener, MouseMotionListener {
+public class ImagePanel extends JPanel implements MouseListener, MouseMotionListener
+{
 	/**
 	 * some java stuff to get rid of warnings
 	 */
@@ -67,7 +72,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	public static Polygon currentlySelectedPolygon = null;
 	
 	public static enum MODES {ADDING, EDITING, STARTUP};
-	public static MODES currentMode = MODES.STARTUP;
+	public static MODES currentMode = MODES.ADDING;
 
 	private int currentlySelectedPoint;
 	private boolean dragging = false;
@@ -80,8 +85,6 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		currentPolygon = new Polygon(this);
 		polygonsList = new ArrayList<Polygon>();
 
-		this.setVisible(true);
-
 		Dimension panelSize = new Dimension(800, 600);
 		this.setSize(panelSize);
 		this.setMinimumSize(panelSize);
@@ -90,6 +93,8 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		
 		addMouseListener(this);
 		addMouseMotionListener(this);
+		
+		this.setVisible(true);
 	}
 	
 	/**
@@ -111,9 +116,7 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	/**
 	 * Displays the image
 	 */
-	public void ShowImage() {
-		Graphics g = this.getGraphics();
-		
+	public void ShowImage(Graphics g) {
 		if (image != null) {
 			g.drawImage(
 					image, 0, 0, null);
@@ -125,21 +128,21 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		super.paint(g);
 		
 		//display image
-		ShowImage();
+		ShowImage(g);
 		
 		//display all the completed polygons
 		if (polygonsList.size() != 0)
 		{
 			for(Polygon polygon : polygonsList) {
-				polygon.drawPolygon();
-				polygon.finishPolygon(this.getGraphics());
+				polygon.drawPolygon(g);
+				polygon.finishPolygon(g);
 			}
 		}
 		
 		//display current polygon
 		if (currentPolygon != null)
 		{
-			this.currentPolygon.drawPolygon();
+			this.currentPolygon.drawPolygon(g);
 		}
 		
 	}
@@ -188,16 +191,23 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		if (currentPolygon != null && currentPolygon.getSize() >= 2) {
 			currentPolygon.finishPolygon(this.getGraphics());
 			polygonsList.add(currentPolygon);
+			
+			ImageLabeller.addTag.setEnabled(true);
+			ImageLabeller.editTag.setEnabled(true);
+			ImageLabeller.deletePolygon.setEnabled(true);
+			
+			ImageLabeller.saveAsFile.setEnabled(true);
+			if (ImageLabeller.savedOnce)
+			{
+				ImageLabeller.saveFile.setEnabled(true);
+			}
+			
+			this.needSaved = true;
+			currentPolygon = new Polygon(this);
+			ImagePanel.currentMode = MODES.EDITING;
+			this.repaint();
 		}
 		
-		ImageLabeller.saveAsFile.setEnabled(true);
-		if (ImageLabeller.savedOnce)
-		{
-			ImageLabeller.saveFile.setEnabled(true);
-		}
-		this.needSaved = true;
-		currentPolygon = new Polygon(this);
-		ImagePanel.currentMode = MODES.EDITING;
 	}
 	
 	public void resetShape()
@@ -231,10 +241,13 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			switch (currentMode)
 			{
 			case ADDING:
+				ImageLabeller.addTag.setEnabled(false);
+				ImageLabeller.editTag.setEnabled(false);
+				ImageLabeller.deletePolygon.setEnabled(false);
 				g.setColor(Color.GREEN);
 				
 				// If this is the first point of the polygon again, or user double clicks finish it
-				if (isFirstPoint(x,y) || e.getClickCount() == 2)
+				if ((isFirstPoint(x,y) || e.getClickCount() == 2))
 				{
 					addNewPolygon();
 					return;
@@ -249,14 +262,29 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 				currentPolygon.addPoint(new Point(x, y));
 				break;
 			case EDITING:
+				ImageLabeller.addTag.setEnabled(true);
 				this.findPoint(e.getPoint());
 				break;
 			case STARTUP:
 				JOptionPane.showMessageDialog(this, "It looks like you're trying to add a new tag.\nClick the \"+\" button in the toolbox to add a new tag.", "Adding a new tag?", JOptionPane.INFORMATION_MESSAGE);
 				break;
 			}
-			
 		} 
+		if (e.getButton() == MouseEvent.BUTTON3)
+		{
+			if (currentMode == MODES.ADDING)
+			{
+				if (currentPolygon.getSize() != 0) {
+					Point lastVertex = currentPolygon.getPoint(currentPolygon.getSize() - 1);
+					g.drawLine(lastVertex.getX(), lastVertex.getY(), x, y);
+				}
+				g.fillOval(x-5,y-5,10,10);
+				
+				currentPolygon.addPoint(new Point(x, y));
+				addNewPolygon();
+				return;
+			}
+		}
 	}
 
 	private boolean isFirstPoint(int x, int y) {
@@ -282,7 +310,6 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 	{
 		if (currentMode == MODES.EDITING)
 		{
-			System.out.println("Mouse pressed");
 			Point point = this.findPoint(e.getPoint());
 			
 			if (point == null)
@@ -359,13 +386,17 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 		ImageLabeller.polygonList.removePolygon(currentlySelectedPolygon);
 		this.currentPolygon = new Polygon(this);
 		currentlySelectedPolygon = null;
+		ImageLabeller.STATUS.setText("To add a new tag click the + button");
 		this.repaint();
 	}
 	
 	public Point findPoint(java.awt.Point point)
 	{
+		Point point2 = null;
+		boolean found = false;
 		for (Polygon polygon : this.polygonsList)
 		{
+			
 			for (int i = 0; i < polygon.getSize(); i++)
 			{
 				System.out.println(polygon.getPoint(i));
@@ -376,13 +407,18 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 					polygon.select();
 					ImageLabeller.polygonList.setSelected(polygon);
 					
-					return polygon.getPoint(i);
+					point2 = polygon.getPoint(i);
+					found = true;
+					break;
 				}
 			}
-			polygon.unselect();
+			if (!found)
+			{
+				polygon.unselect();
+			}
 		}
 		
-		return null;
+		return point2;
 	}
 	
 	public String getPolygonsAsString()
@@ -494,6 +530,5 @@ public class ImagePanel extends JPanel implements MouseListener, MouseMotionList
 			e.printStackTrace();
 		}
 	}
-
 
 }

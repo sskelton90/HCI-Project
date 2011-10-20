@@ -72,32 +72,30 @@ public class PolygonList extends JPanel implements ListSelectionListener
 	@Override
 	public void valueChanged(ListSelectionEvent e) 
 	{
-		if (listModel.getSize() == 0)
-		{
-			ImageLabeller.editTag.setEnabled(false);
-			ImageLabeller.deletePolygon.setEnabled(false);
-			return;
-		}
-		
-		for (int i = 0; i < listModel.getSize(); i++)
-		{
-			Polygon polygon = (Polygon) this.listModel.get(i);
-			if (polygon.isSelected()){
-				polygon.unselect();
-			}
-		}
-		
-		int index = list.getSelectedIndex();
-		if (index != -1)
-		{
-			Polygon polygon = (Polygon) this.listModel.get(index);
-			polygon.select();
-			
-			ImagePanel.currentlySelectedPolygon = polygon;
-			
-			ImageLabeller.editTag.setEnabled(true);
-			ImageLabeller.deletePolygon.setEnabled(true);
-		}
+//		int index = list.getSelectedIndex();
+//		if (listModel.getSize() == 0)
+//		{
+//			ImageLabeller.editTag.setEnabled(false);
+//			ImageLabeller.deletePolygon.setEnabled(false);
+//			return;
+//		}
+//		
+//		for (int i = 0; i < listModel.getSize(); i++)
+//		{
+//			Polygon polygon = (Polygon) this.listModel.get(i);
+//			polygon.unselect();
+//		}
+//		
+//		if (index != -1)
+//		{
+//			Polygon polygon = (Polygon) this.listModel.get(index);
+//			polygon.select();
+//			
+//			ImagePanel.currentlySelectedPolygon = polygon;
+//			
+//			ImageLabeller.editTag.setEnabled(true);
+//			ImageLabeller.deletePolygon.setEnabled(true);
+//		}
 	}
 
 }

@@ -1,0 +1,58 @@
+Help
+
+Contents
+    What is Tagger?
+    Opening Images
+    Tagging Shapes
+    Editing Tags
+    Saving Tags
+    Submitting to the Project
+    
+What is Tagger?
+
+Tagger is a package designed to aid academics researching in the field of image recognition. They need images which have sections correctly tagged so that they can test the accuracy of object recognition software. Tagger is designed to allow the user to open up any image they have stored on their hard disk, tag relevant sections accurately then save the results for submission.
+
+The project that this particular package has been set up is run by Andrew Burnie and Steven Skelton at the University of Edinburgh. See the website below for more details.
+
+    www.ed.ac.uk
+    
+Opening Images
+
+To open a new image first click on 'File' in the top left corner of the window to open a drop down menu. From this drop down menu click 'Open Image...'. This will open up a new window where you can select the image file you want to open. All images must be of one of the following types:
+   
+    * TIFF
+    * JPEG 
+    * GIF
+    * PNG
+    
+Files can be opened either by double clicking their icon or name or by clicking on them then selecting Open.
+
+Tagging Shapes
+
+To tag a new shape simply click on the displayed image where you wish to place the first point. You can then click to add further points. To finish a shape simply click on the start point. If, while creating a shape you wish to remove the last point placed you can click the 'Delete Last Point'.
+
+Once your shape is complete you will be prompted to name the tag. Simply type a name into the 'Tag Name' text box and click save. If you do not want to place the tag you can click the cancel button and it will be erased.
+
+It is important that you only tag one shape, for example we do not want tags that say things like 'people' and circle a group of people. We want tags the say 'person' and label each of the people individually.
+
+Other Options:
+
+Double click the final point you are adding to complete the shape.
+Press backspace to delete the last point placed.
+Press escape while you are creating a shape to delete the whole thing
+
+Editing Tags
+
+To move the points in a tag you should, while not creating another shape, simply click and drag them to the point you want them to be placed at.
+
+If you want to change the name or colour of the tag you should click on the name of the tag in the box on the top right of the window then the edit button below. This will open a window where you can change the name of the tag and the colour if required.
+
+Saving Tags
+
+At any point you can save your progress by clicking on 'File' in the top left corner of the window and selecting 'Save' from the drop down menu. This will automatically save the tags using the image name and the file extension '.tags'. For example if you were working on an image called 'Picture.jpg' the saved tags would have the name 'Picture.tags'.
+
+Submitting to The Project
+
+Once you have completed tagging of images you should follow the instructions at the website below to submit to the project. Thank you!
+
+    http://www.madeupwebsite.ed.ac.uk/submission

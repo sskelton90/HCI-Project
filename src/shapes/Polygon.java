@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.swing.JPanel;
 
@@ -31,7 +32,7 @@ public class Polygon
 	/**
 	 * Each {@link Polygon} has {@link Color}.
 	 */
-	private Color colour = Color.GREEN;
+	private Color colour = pickRandomColour();
 
 	boolean hasBeenEdited = false;
 	boolean isSelected = false;
@@ -120,10 +121,9 @@ public class Polygon
 		this.hidden = true;
 	}
 
-	public void drawPolygon() {
+	public void drawPolygon(Graphics g) {
 		if (!hidden)
 		{
-			Graphics2D g = (Graphics2D) this.panel.getGraphics();
 			for(int i = 0; i < this.vertices.size(); i++) {
 				Point currentVertex = this.vertices.get(i);
 				g.setColor(this.colour);
@@ -131,13 +131,13 @@ public class Polygon
 					Point prevVertex = this.vertices.get(i - 1);
 
 					Line l = new Line(prevVertex, currentVertex);
-					l.paintLine(g, this.isSelected);
+					l.paintLine((Graphics2D) g, this.isSelected);
 				}
 
 				if (i == this.vertices.size() - 1 && finishedOnce)
 				{
 					Line l = new Line(this.vertices.get(0), currentVertex);
-					l.paintLine(g, this.isSelected);
+					l.paintLine((Graphics2D) g, this.isSelected);
 				}
 				currentVertex.paintComponent(g);
 			}
@@ -252,5 +252,16 @@ public class Polygon
 		}
 
 		return true;
+	}
+	
+	private Color pickRandomColour()
+	{
+		Random randomGenerator = new Random();
+		int r = randomGenerator.nextInt(255);
+		int g = randomGenerator.nextInt(255);
+		int b = randomGenerator.nextInt(255);
+		Color colour = new Color(r, g, b, 255);
+		
+		return colour;
 	}
 }
